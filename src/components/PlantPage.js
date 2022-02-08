@@ -5,6 +5,7 @@ import Search from "./Search";
 
 function PlantPage() {
   const [data, setData] = useState([])
+  const [searchValue, setSearchValue] = useState("")
   
   useEffect(() => {
     fetch('http://localhost:6001/plants')
@@ -12,22 +13,25 @@ function PlantPage() {
       .then(setData)
   }, [])
 
-  function handleOnSubmit(e) {
-    e.preventDefault()
-    const formData = {
-      name: e.target.name.value,
-      image: e.target.image.value,
-      price: e.target.price.value
-    }
-    setData([...data, formData])
-    console.log(data)
+  function addNewPlant(plant) {
+    setData([plant, ...data])
   }
+ 
+  function handleChange(e) {
+    setSearchValue(e.target.value)
+  }
+
+  const searchedPlants = data.filter(plantObj => {
+    const lowerPlantName = plantObj.name.toLowerCase()
+    const lowerSearchName = searchValue.toLocaleLowerCase()
+    return lowerPlantName.includes(lowerSearchName)
+  })
 
   return (
     <main>
-      <NewPlantForm handleOnSubmit={handleOnSubmit}/>
-      <Search />
-      <PlantList data={data} setData={setData}/>
+      <NewPlantForm addNewPlant={addNewPlant}/>
+      <Search handleChange={handleChange}/>
+      <PlantList data={searchedPlants} setData={setData}/>
     </main>
   );
 }
